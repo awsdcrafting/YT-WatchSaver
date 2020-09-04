@@ -24,31 +24,35 @@
     }
 
 
+    function addSite() {
+        if (window.location.href.includes("/watch")) {
+            var titleMatch = document.title.match(/^(?:\([0-9]+\) )?(.*?)(?: - YouTube)$/); // ("(n) ") + "TITLE - YouTube"
+            var videoUrl = window.location.href
+            if (!titleMatch) {
+                console.log("ERROR: Video is deleted!");
+
+            } else {
+                var title = titleMatch[1]
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: "http://localhost:15643/add",
+                    data: "{\"title\":\"" + title + "\",\"url\":\"" + videoUrl + "\"}",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    onload: function (response) {
+                        console.log("got response");
+                        console.log(response);
+                    }
+                });
+            }
+        }
+    }
+
     window.addEventListener("yt-navigate-finish", () => {
         $('[YoutubeAutotranslateCanceler]', false, () => {
             console.log('Event fired')
-            if (window.location.href.includes("/watch")) {
-                var titleMatch = document.title.match(/^(?:\([0-9]+\) )?(.*?)(?: - YouTube)$/); // ("(n) ") + "TITLE - YouTube"
-                var videoUrl = window.location.href
-                if (!titleMatch) {
-                    console.log("ERROR: Video is deleted!");
-
-                } else {
-                    var title = titleMatch[1]
-                    GM_xmlhttpRequest({
-                        method: "POST",
-                        url: "http://localhost:15643/add",
-                        data: "{\"title\":\"" + title + "\",\"url\":\"" + videoUrl + "\"}",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        onload: function (response) {
-                            console.log("got response");
-                            console.log(response);
-                        }
-                    });
-                }
-            }
+            setTimeout(addSite, 1000); //wait a sec so that everything can load
         })
     });
 })();
