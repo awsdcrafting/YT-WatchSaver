@@ -8,6 +8,7 @@ import io.ktor.http.URLParserException
 import io.ktor.http.Url
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
@@ -124,7 +125,7 @@ class DBConnection(config: Config)
         }
         //save all
         transaction(db) {
-            for (siteEntity in SiteEntity.all())
+            for (siteEntity in SiteEntity.all().orderBy(SiteTable.times to SortOrder.DESC))
             {
                 val site = siteEntity.toSiteModel()
                 writer.write("${convertSite(site, type)}$ln")

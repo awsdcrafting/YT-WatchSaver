@@ -136,6 +136,12 @@ fun Application.module()
         {
             val type = call.receive<Type>().type
             val file = File(Statics.config[DatabaseSpec.fileSave] + "." + type)
+            if (file.exists())
+            {
+                file.delete()
+            }
+            file.createNewFile()
+            Statics.db.saveTo(file, type)
             call.respond(HttpStatusCode.OK, Status(Status.SUCCESSFUL, "saved file to ${file.absolutePath}"))
         }
     }
