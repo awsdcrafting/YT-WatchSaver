@@ -7,6 +7,7 @@ import eu.scisneromam.models.SiteModel
 import io.ktor.http.URLParserException
 import io.ktor.http.Url
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
@@ -25,18 +26,22 @@ class DBConnection(config: Config)
     init
     {
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
+        transaction(db)
+        {
+            SchemaUtils.createMissingTablesAndColumns(SiteTable)
+        }
     }
 
     fun transformUrl(url: String): String
     {
         return Url(url).let {
-            it.host + if (it.specifiedPort != it.protocol.defaultPort)
+            it.host + if (it.specifiedPort != 0 && it.specifiedPort != it.protocol.defaultPort)
             {
                 ":${it.specifiedPort}"
             } else
             {
                 ""
-            }
+            } + it.encodedPath + "?v=" + it.parameters["v"]
         }
     }
 
@@ -129,6 +134,7 @@ class DBConnection(config: Config)
         {
             "json" -> writer.write("]$ln")
         }
+        writer.flush()
     }
 
     fun convertSite(site: SiteModel, type: String): String
