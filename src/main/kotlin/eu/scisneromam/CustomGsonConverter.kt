@@ -99,7 +99,7 @@ class CustomGsonConverter(val gson: Gson = Gson()) : ContentConverter
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> parseJson(json: String, gson: Gson, type: Class<*>): T
+    fun <T> parseJson(json: String, gson: Gson = this.gson, type: Class<*>): T
     {
         println("Converting: $json")
         return try
@@ -123,12 +123,13 @@ class CustomGsonConverter(val gson: Gson = Gson()) : ContentConverter
 fun ContentNegotiation.Configuration.cgson(
     contentType: ContentType = ContentType.Application.Json,
     block: GsonBuilder.() -> Unit = {}
-)
+): CustomGsonConverter
 {
     val builder = GsonBuilder()
     builder.apply(block)
     val converter = CustomGsonConverter(builder.create())
     register(contentType, converter)
+    return converter
 }
 
 internal class ExcludedTypeGsonException(
