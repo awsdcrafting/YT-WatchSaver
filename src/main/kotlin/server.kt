@@ -132,7 +132,7 @@ fun Application.module()
                 HttpStatusCode.OK, Status(Status.SUCCESSFUL, "there are $count urls in the db", mapOf("count" to count))
             )
         }
-        get("/save")
+        post("/save")
         {
             val type = call.receive<Type>().type
             val file = File(Statics.config[DatabaseSpec.fileSave] + "." + type)

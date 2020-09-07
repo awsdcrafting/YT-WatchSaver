@@ -3,10 +3,14 @@ Features:
 It creates a local webserver. <br>
 The webserver listens on a port 15643 on default, or a port specified by you.
 
-Planned:
-- request to '/add' to add an url with a titel
-- request to '/save' to save all logged to a csv file
+Features:
+- json post request to '/add' to add an url with a titel
+    - example: { "title": "An example title", "url": "http://example.org"}
+- json post request to '/save' to save all logged to a csv/json file
+    - example: { "type": "csv" }
 - add sqlite db
+
+Planned:
 - gui
 
 Why does this project exists?

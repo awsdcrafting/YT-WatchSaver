@@ -1,7 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.0"
+    id("com.github.johnrengelman.shadow") version "5.0.0"
     application
 }
 group = "eu.scisneromam"
@@ -51,9 +53,16 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
 
 }
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("YT-WatchSaver")
+        mergeServiceFiles()
+    }
 }
+
 application {
     mainClassName = "ServerKt"
 }
