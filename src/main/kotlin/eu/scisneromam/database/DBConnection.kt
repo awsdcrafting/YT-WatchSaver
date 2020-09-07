@@ -115,27 +115,27 @@ class DBConnection(config: Config)
 
     fun saveTo(file: File, type: String)
     {
-        val writer = file.writer()
-        val ln = System.lineSeparator()
-        when (type)
-        {
-            "csv" -> writer.write("title,url,times$ln")
-            "json" -> writer.write("[$ln")
-            else   -> return
-        }
-        //save all
-        transaction(db) {
-            for (siteEntity in SiteEntity.all().orderBy(SiteTable.times to SortOrder.DESC))
+        file.writer().use { writer ->
+            val ln = System.lineSeparator()
+            when (type)
             {
-                val site = siteEntity.toSiteModel()
-                writer.write("${convertSite(site, type)}$ln")
+                "csv" -> writer.write("title,url,times$ln")
+                "json" -> writer.write("[$ln")
+                else   -> return
+            }
+            //save all
+            transaction(db) {
+                for (siteEntity in SiteEntity.all().orderBy(SiteTable.times to SortOrder.DESC))
+                {
+                    val site = siteEntity.toSiteModel()
+                    writer.write("${convertSite(site, type)}$ln")
+                }
+            }
+            when (type)
+            {
+                "json" -> writer.write("]$ln")
             }
         }
-        when (type)
-        {
-            "json" -> writer.write("]$ln")
-        }
-        writer.flush()
     }
 
     fun convertSite(site: SiteModel, type: String): String
