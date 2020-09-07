@@ -125,10 +125,19 @@ class DBConnection(config: Config)
             }
             //save all
             transaction(db) {
-                for (siteEntity in SiteEntity.all().orderBy(SiteTable.times to SortOrder.DESC))
-                {
+                val list = SiteEntity.all().orderBy(SiteTable.times to SortOrder.DESC)
+                list.forEachIndexed()
+                { index, siteEntity ->
                     val site = siteEntity.toSiteModel()
-                    writer.write("${convertSite(site, type)}$ln")
+                    writer.write(convertSite(site, type))
+                    when (type)
+                    {
+                        "json" -> if (index < list.count())
+                        {
+                            writer.write(",")
+                        }
+                    }
+                    writer.write(ln)
                 }
             }
             when (type)
