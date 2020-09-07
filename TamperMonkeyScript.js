@@ -12,39 +12,44 @@
 // ==/UserScript==
 
 
-(function () {
-    function $(group, collapsed, block) {
+
+(function(){
+    function $(group, collapsed, block){
         collapsed ? console.groupCollapsed(group) : console.group(group)
-        try {
-            block()
-        } catch (e) {
-            console.error(e)
-        }
+        try { block() } catch(e) { console.error(e) }
         console.groupEnd(group)
     }
 
 
-    function addSite() {
-        if (window.location.href.includes("/watch")) {
-            var titleMatch = document.title.match(/^(?:\([0-9]+\) )?(.*?)(?: - YouTube)$/); // ("(n) ") + "TITLE - YouTube"
+    function addSite()
+    {
+        if (window.location.href.includes ("/watch")){
+            var titleMatch = document.title.match (/^(?:\([0-9]+\) )?(.*?)(?: - YouTube)$/); // ("(n) ") + "TITLE - YouTube"
             var videoUrl = window.location.href
             if (!titleMatch) {
-                console.log("ERROR: Video is deleted!");
-
+                console.log ("ERROR: Video is deleted!");
+                return;
             } else {
-                var title = titleMatch[1]
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: "http://localhost:15643/add",
-                    data: "{\"title\":\"" + title + "\",\"url\":\"" + videoUrl + "\"}",
-                    headers: {
+                var videoTitle = titleMatch[1]
+                var jsData = {
+                    title: videoTitle,
+                    url : videoUrl
+                }
+                var jsString = JSON.stringify(jsData)
+                console.log(jsData)
+                console.log(jsString)
+                GM_xmlhttpRequest ( {
+                    method:     "POST",
+                    url:        "http://localhost:15643/add",
+                    data:       jsString,
+                    headers:    {
                         "Content-Type": "application/json"
                     },
-                    onload: function (response) {
-                        console.log("got response");
-                        console.log(response);
+                    onload:     function (response) {
+                        console.log ("got response");
+                        console.log (response);
                     }
-                });
+                } );
             }
         }
     }
